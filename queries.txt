@@ -1,0 +1,28 @@
+{
+  "car": {
+    "brand":"BMW",
+    "model":"340",
+    "year":"2005",
+    "mileage":"350000",
+    "drivetrain":"HAHAH",
+    "fuel":"Petrol",
+    "transmission":"HAHAHA",
+    "engine":"3.0",
+    "color":"Blue",
+    "number":"005 DEN",
+    "price":"100000",
+    "description":"GOOOD"
+  }
+}
+
+//register
+
+{
+  "user":{
+    "email": "leshka1@gmail.com",
+    "password": "123123",
+    "confirmPassword": "123123",
+    "phone": "+37253343344",
+    "name": "Leshka52"
+  }
+}
