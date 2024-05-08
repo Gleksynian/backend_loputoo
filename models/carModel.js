@@ -40,15 +40,15 @@ Car.init(
     },
     engine: {
       type: DataTypes.STRING(40),
-      allowNull: false,
+      allowNull: true,
     },
     color: {
       type: DataTypes.STRING(40),
-      allowNull: false,
+      allowNull: true,
     },
     number: {
       type: DataTypes.STRING(15),
-      allowNull: false,
+      allowNull: true,
     },
     price: {
       type: DataTypes.FLOAT,

@@ -14,14 +14,15 @@ const types = {
 }
 
 export const create = async (req, res) => {
-    const { car } = req.body;
+    const car = JSON.parse(req.body.car);
     const { img } = req.files;
-    console.log(req.authUser);
+    console.log(img);
     car.owner = req.authUser.id
+
     const newCar = await CarModel.create(car)
     let filename = uuidv4() + types[img.mimetype];
     img.mv(path.resolve(__dirname, '..', 'static', filename));
-    ImageModel.create({ "car_id": newCar.id, "path": filename })
+    ImageModel.create({ "car_id": newCar.id, "url": filename })
     return res.json(newCar)
 }
 export const findAll = async (req, res) => {
