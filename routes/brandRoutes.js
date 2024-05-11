@@ -1,7 +1,6 @@
 import express from 'express';
-import { create, findById, findAll, update, remove } from '../controllers/carController.js';
+import { create, findById, findAll, update, remove } from '../controllers/brandController.js';
 import { verifyToken } from '../middleware/middleware.js';
-
 
 const router = express.Router();
 

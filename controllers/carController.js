@@ -2,7 +2,8 @@ import CarModel from '../models/carModel.js'
 import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import { fileURLToPath } from 'url';
-import ImageModel from '../models/imageModel.js'
+import Brand from '../models/brandModel.js';
+import Moodel from '../models/modelModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,17 +17,15 @@ const types = {
 export const create = async (req, res) => {
     const car = JSON.parse(req.body.car);
     const { img } = req.files;
-    console.log(img);
     car.owner = req.authUser.id
-
-    const newCar = await CarModel.create(car)
     let filename = uuidv4() + types[img.mimetype];
+    car.image = filename
+    const newCar = await CarModel.create(car)
     img.mv(path.resolve(__dirname, '..', 'static', filename));
-    ImageModel.create({ "car_id": newCar.id, "url": filename })
     return res.json(newCar)
 }
 export const findAll = async (req, res) => {
-    const car = await CarModel.findAll()
+    const car = await CarModel.findAll({include:[{model:Brand}, {model:Moodel}]})
     return res.json(car)
 }
 export const findById = async (req, res) => {

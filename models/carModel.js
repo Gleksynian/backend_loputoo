@@ -1,7 +1,9 @@
 import db from '../dbConnect.js';
 import { DataTypes, Model } from 'sequelize';
-import UserModel from './userModel.js';
 import User from './userModel.js';
+import Moodel from './modelModel.js';
+import Brand from './brandModel.js';
+import City from './cityModel.js';
 
 class Car extends Model { }
 Car.init(
@@ -12,12 +14,24 @@ Car.init(
       primaryKey: true,
     },
     brand: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Brand,
+        key: "id"
+      }
     },
     model: {
-      type: DataTypes.STRING(100),
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: Moodel,
+        key: "id"
+      }
+    },
+    bodyType: {
+      type: DataTypes.STRING(50),
+      allowNull:false,
     },
     year: {
       type: DataTypes.INTEGER,
@@ -40,15 +54,19 @@ Car.init(
     },
     engine: {
       type: DataTypes.STRING(40),
-      allowNull: true,
+      allowNull: false,
+    },
+    power: {
+      type: DataTypes.STRING(30),
+      allowNull:false,
     },
     color: {
       type: DataTypes.STRING(40),
-      allowNull: true,
+      allowNull: false,
     },
     number: {
       type: DataTypes.STRING(15),
-      allowNull: true,
+      allowNull: false,
     },
     price: {
       type: DataTypes.FLOAT,
@@ -65,6 +83,16 @@ Car.init(
     description: {
       type: DataTypes.TEXT,
     },
+    image: {
+      type: DataTypes.STRING,
+    },
+    city_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: City,
+        key: "id"
+      }
+    }
   },
   {
     sequelize: db,
