@@ -10,13 +10,3 @@ export const verifyToken = (req, res, next) => {
         next();
     });
 };
-
-export const isOwner = async (req, res, next) => {
-    const {id} = req.params
-    const car = await CarModel.findByPk(id)
-    const userId = req.authUser.id
-    if (car.owner !== userId) {
-        return res.sendStatus(403)
-    }
-    next()
-}

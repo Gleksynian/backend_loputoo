@@ -6,14 +6,14 @@ import ModelModel from './modelModel.js'
 import UserModel from './userModel.js'
 
 export default [
-    CarModel.hasOne(BrandModel, {foreignKey:'car_id'}),
-    BrandModel.belongsTo(CarModel, {foreignKey:'car_id', onDelete:'CASCADE'}),
+    CarModel.belongsTo(BrandModel, {foreignKey:'brand'}),
+    BrandModel.hasMany(CarModel, {foreignKey:'brand'}),
 
-    CarModel.hasOne(ModelModel, {foreignKey:'car_id'}),
-    ModelModel.belongsTo(CarModel, {foreignKey:'car_id', onDelete:'CASCADE'}),
+    CarModel.belongsTo(ModelModel, {foreignKey:'model'}),
+    ModelModel.hasMany(CarModel, {foreignKey:'model'}),
 
     CarModel.belongsTo(CityModel, {foreignKey:'city_id'}),
-    CityModel.hasOne(CarModel, {foreignKey:'city_id', onDelete:'CASCADE'}),
+    CityModel.hasMany(CarModel, {foreignKey:'city_id'}),
 
     UserModel.hasOne(CarModel, {foreignKey:'owner'}),
     CarModel.belongsTo(UserModel, {foreignKey:'owner'}),

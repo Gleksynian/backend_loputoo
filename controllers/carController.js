@@ -4,6 +4,8 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import Brand from '../models/brandModel.js';
 import Moodel from '../models/modelModel.js';
+import City from '../models/cityModel.js';
+import User from '../models/userModel.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,12 +27,12 @@ export const create = async (req, res) => {
     return res.json(newCar)
 }
 export const findAll = async (req, res) => {
-    const car = await CarModel.findAll({include:[{model:Brand}, {model:Moodel}]})
+    const car = await CarModel.findAll({include:[{model:Brand}, {model:Moodel}, {model:City}, {model: User}]})
     return res.json(car)
 }
 export const findById = async (req, res) => {
     const { id } = req.params;
-    const car = await CarModel.findByPk(id)
+    const car = await CarModel.findByPk(id, {include:[{model:Brand}, {model:Moodel}, {model:City}, {model: User}]})
     return res.json(car)
 }
 export const update = async (req, res) => {

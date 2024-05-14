@@ -17,7 +17,7 @@ export const login = async (req, res) => {
     const {user} = req.body;
     const existUser = await UserModel.findOne({
         where: {
-            email: user.email,
+            email:user.email
         },
     });
     const match = await bcrypt.compare(user.password, existUser.password);
@@ -32,7 +32,7 @@ export const login = async (req, res) => {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
     });
-    res.json({ accessToken });
+    res.json({ accessToken, existUser });
 
 };
 export const findAll = async (req, res) => {

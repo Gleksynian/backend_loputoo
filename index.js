@@ -13,13 +13,6 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-try {
-    await db.authenticate();
-    await db.sync();
-    console.log('Database connected');
-} catch (error) {
-    console.log('Connection error: ', error);
-}
 app.use(cors({}));
 // app.use(cors({ credentials: true, origin: 'http://localhost:3000/' }));
 app.use(express.json());
@@ -27,5 +20,13 @@ app.use(express.static(path.resolve(__dirname, 'static')))
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload({}));
 app.use(router)
+
+try {
+    await db.authenticate();
+    await db.sync();
+    console.log('Database connected');
+} catch (error) {
+    console.log('Connection error: ', error);
+}
 
 app.listen(5000, () => console.log('Server running at port 5000'));
