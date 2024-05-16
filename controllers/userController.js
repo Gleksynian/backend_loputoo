@@ -1,11 +1,12 @@
 import UserModel from '../models/userModel.js'
+import CarModel from '../models/carModel.js'
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 export const register = async (req, res) => {
-    const {user} = req.body;
+    const { user } = req.body;
     if (user.password !== user.confirmPassword) {
-        return res.json({"error":"passwords not match"})
+        return res.json({ "error": "passwords not match" })
     }
     const hashedPassword = await bcrypt.hash(user.password, 8);
     user.password = hashedPassword;
@@ -14,10 +15,10 @@ export const register = async (req, res) => {
 }
 
 export const login = async (req, res) => {
-    const {user} = req.body;
+    const { user } = req.body;
     const existUser = await UserModel.findOne({
         where: {
-            email:user.email
+            email: user.email
         },
     });
     const match = await bcrypt.compare(user.password, existUser.password);
@@ -40,18 +41,33 @@ export const findAll = async (req, res) => {
     return res.json(user)
 }
 export const findById = async (req, res) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const user = await UserModel.findByPk(id)
     return res.json(user)
 }
 export const update = async (req, res) => {
-    const {id} = req.params;
-    const {user} = req.body;
-    const updatedUser = await UserModel.update(user, {where:{id:id}})
+    const { id } = req.params;
+    const { user } = req.body;
+    const updatedUser = await UserModel.update(user, { where: { id: id } })
     return res.json(updatedUser)
 }
 export const remove = async (req, res) => {
-    const {id} = req.params;
-    const user = await UserModel.destroy({where:{id:id}})
+    const { id } = req.params;
+    const user = await UserModel.destroy({ where: { id: id } })
     return res.json(user)
 }
+
+export const findCarsByUserId = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const cars = await CarModel.findAll({
+            where: {
+                owner: id
+            }
+        });
+        return res.json(cars);
+    } catch (error) {
+        console.error("Error fetching ads by user ID:", error);
+        return res.status(500).json({ error: "Error fetching ads by user ID" });
+    }
+};
