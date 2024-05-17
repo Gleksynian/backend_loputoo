@@ -17,4 +17,10 @@ export default [
 
     UserModel.hasOne(CarModel, {foreignKey:'owner'}),
     CarModel.belongsTo(UserModel, {foreignKey:'owner'}),
+
+    UserModel.belongsToMany(CarModel, {foreignKey: 'user_id', through: FavoriteModel}),
+    CarModel.belongsToMany(UserModel, {foreignKey: 'car_id', through: FavoriteModel}),
+
+    CarModel.hasMany(FavoriteModel, {foreignKey:'car_id'}),
+    FavoriteModel.belongsTo(CarModel, {foreignKey:'car_id'}),
 ]

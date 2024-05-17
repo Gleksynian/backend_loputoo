@@ -59,15 +59,10 @@ export const remove = async (req, res) => {
 
 export const findCarsByUserId = async (req, res) => {
     const { id } = req.params;
-    try {
-        const cars = await CarModel.findAll({
-            where: {
-                owner: id
-            }
-        });
-        return res.json(cars);
-    } catch (error) {
-        console.error("Error fetching ads by user ID:", error);
-        return res.status(500).json({ error: "Error fetching ads by user ID" });
-    }
-};
+    const cars = await CarModel.findAll({
+        where: {
+            owner: id
+        }
+    });
+    return res.json(cars);
+}

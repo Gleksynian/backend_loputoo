@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.static(path.resolve(__dirname, 'static')))
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload({}));
-app.use(router)
+app.use('/api',router)
 
 try {
     await db.authenticate();
