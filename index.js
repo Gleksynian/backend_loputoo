@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import 'dotenv/config'
+import 'dotenv/config';
 import db from './dbConnect.js';
 import router from './routes/index.js';
 import fileUpload from 'express-fileupload';
@@ -13,13 +13,17 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(cors({}));
-// app.use(cors({ credentials: true, origin: 'http://localhost:3000/' }));
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static(path.resolve(__dirname, 'static')))
+app.use(express.static(path.resolve(__dirname, 'static')));
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload({}));
-app.use('/api',router)
+app.use('/api', router);
 
 try {
     await db.authenticate();
