@@ -14,6 +14,11 @@ const types = {
     "image/jpg": ".jpg",
     "image/jpeg": ".jpeg",
     "image/webp": ".webp",
+    "image/avif": ".avif",
+    "image/bmp": ".bmp",
+    "image/tiff": ".tiff",
+    "image/svg+xml": ".svg",
+    "image/x-icon": ".ico"
 }
 
 export const create = async (req, res) => {
