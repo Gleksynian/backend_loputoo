@@ -31,7 +31,7 @@ export const create = async (req, res) => {
     img.mv(path.resolve(__dirname, '..', 'static', filename));
     return res.json(newCar)
 }
-export const findAll = async (req, res) => {
+export const findAll = async (req, res) => { 
     const car = await CarModel.findAll({include:[{model:Brand}, {model:Moodel}, {model:City}, {model: User}]})
     return res.json(car)
 }
@@ -42,7 +42,14 @@ export const findById = async (req, res) => {
 }
 export const update = async (req, res) => {
     const { id } = req.params;
-    const { car } = req.body;
+    const car = JSON.parse(req.body.car);
+    const img = req.files.img;
+    car.owner = req.authUser.id
+    if (img) {
+        let filename = uuidv4() + types[img.mimetype];
+        car.image = filename
+        img.mv(path.resolve(__dirname, '..', 'static', filename));
+    }
     const updatedCar = await CarModel.update(car, { where: { id: id } })
     return res.json(updatedCar)
 }
