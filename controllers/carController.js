@@ -31,28 +31,36 @@ export const create = async (req, res) => {
     img.mv(path.resolve(__dirname, '..', 'static', filename));
     return res.json(newCar)
 }
-export const findAll = async (req, res) => { 
-    const car = await CarModel.findAll({include:[{model:Brand}, {model:Moodel}, {model:City}, {model: User}]})
+export const findAll = async (req, res) => {
+    const car = await CarModel.findAll({ include: [{ model: Brand }, { model: Moodel }, { model: City }, { model: User }] })
     return res.json(car)
 }
 export const findById = async (req, res) => {
     const { id } = req.params;
-    const car = await CarModel.findByPk(id, {include:[{model:Brand}, {model:Moodel}, {model:City}, {model: User}]})
+    const car = await CarModel.findByPk(id, { include: [{ model: Brand }, { model: Moodel }, { model: City }, { model: User }] })
     return res.json(car)
 }
 export const update = async (req, res) => {
     const { id } = req.params;
     const car = JSON.parse(req.body.car);
-    const img = req.files.img;
-    car.owner = req.authUser.id
-    if (img) {
-        let filename = uuidv4() + types[img.mimetype];
-        car.image = filename
-        img.mv(path.resolve(__dirname, '..', 'static', filename));
+    car.owner = req.authUser.id;
+
+    if (req.files && req.files.img) {
+        const img = req.files.img;
+        const filename = uuidv4() + types[img.mimetype];
+        car.image = filename;
+        await img.mv(path.resolve(__dirname, '..', 'static', filename));
     }
-    const updatedCar = await CarModel.update(car, { where: { id: id } })
-    return res.json(updatedCar)
-}
+
+    const [updated] = await CarModel.update(car, { where: { id: id } });
+
+    if (updated === 0) {
+        return res.status(404).json({ message: 'Car not found or no update made' });
+    }
+
+    const updatedCar = await CarModel.findByPk(id);
+    return res.json({ message: 'Car updated successfully', car: updatedCar });
+};
 export const remove = async (req, res) => {
     const { id } = req.params;
     const car = await CarModel.destroy({ where: { id: id } })
