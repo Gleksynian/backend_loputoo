@@ -5,36 +5,65 @@ import jwt from 'jsonwebtoken';
 
 export const register = async (req, res) => {
     const { user } = req.body;
+
     if (user.password !== user.confirmPassword) {
-        return res.json({ "error": "passwords not match" });
+        return res.status(400).json({ error: "Passwords do not match" });
     }
+
+    const existingEmail = await UserModel.findOne({ where: { email: user.email } });
+    if (existingEmail) {
+        return res.status(400).json({ error: "Email is already in use" });
+    }
+
+    const existingPhone = await UserModel.findOne({ where: { phone: user.phone } });
+    if (existingPhone) {
+        return res.status(400).json({ error: "Phone number is already in use" });
+    }
+
     const hashedPassword = await bcrypt.hash(user.password, 8);
     user.password = hashedPassword;
-    const newUser = await UserModel.create(user);
-    return res.json(newUser);
+
+    try {
+        const newUser = await UserModel.create(user);
+        return res.status(201).json(newUser);
+    } catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
+    }
 };
+
 
 export const login = async (req, res) => {
     const { user } = req.body;
-    const existUser = await UserModel.findOne({
-        where: {
-            email: user.email,
-        },
-    });
-    const match = await bcrypt.compare(user.password, existUser.password);
-    if (!match) return res.status(400).json({ msg: 'Wrong Password' });
-    const userId = existUser.id;
-    const email = existUser.email;
-    const accessToken = jwt.sign({ userId, email },
-        process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: '1d',
-    });
-    res.cookie('token', accessToken, {
-        httpOnly: false,
-        maxAge: 24 * 60 * 60 * 1000,
-    });
-    res.json({ accessToken, existUser });
+
+    try {
+        const existUser = await UserModel.findOne({ where: { email: user.email } });
+
+        if (!existUser) {
+            return res.status(400).json({ error: "User not found" });
+        }
+
+        const match = await bcrypt.compare(user.password, existUser.password);
+        if (!match) {
+            return res.status(400).json({ error: "Incorrect password" });
+        }
+
+        const userId = existUser.id;
+        const email = existUser.email;
+        const accessToken = jwt.sign({ userId, email }, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: '1d',
+        });
+
+        res.cookie('token', accessToken, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        return res.json({ accessToken, existUser });
+    } catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
+    }
 };
+
 
 export const findAll = async (req, res) => {
     const users = await UserModel.findAll();
@@ -51,21 +80,46 @@ export const update = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    if (updates.oldPassword && updates.newPassword) {
-        const user = await UserModel.findByPk(id);
-        const isMatch = await bcrypt.compare(updates.oldPassword, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ error: 'Old password is incorrect' });
-        }
-        updates.password = await bcrypt.hash(updates.newPassword, 8);
-        delete updates.oldPassword;
-        delete updates.newPassword;
-    }
+    try {
+        if (updates.email) {
+            const existingEmail = await UserModel.findOne({
+                where: { email: updates.email },
+            });
 
-    await UserModel.update(updates, { where: { id: id } });
-    const updatedUser = await UserModel.findByPk(id);
-    return res.json(updatedUser);
+            if (existingEmail && existingEmail.id !== parseInt(id, 10)) {
+                return res.status(400).json({ error: 'Email is already in use' });
+            }
+        }
+
+        if (updates.phone) {
+            const existingPhone = await UserModel.findOne({
+                where: { phone: updates.phone },
+            });
+
+            if (existingPhone && existingPhone.id !== parseInt(id, 10)) {
+                return res.status(400).json({ error: 'Phone number is already in use' });
+            }
+        }
+
+        if (updates.oldPassword && updates.newPassword) {
+            const user = await UserModel.findByPk(id);
+            const isMatch = await bcrypt.compare(updates.oldPassword, user.password);
+            if (!isMatch) {
+                return res.status(400).json({ error: 'Old password is incorrect' });
+            }
+            updates.password = await bcrypt.hash(updates.newPassword, 8);
+            delete updates.oldPassword;
+            delete updates.newPassword;
+        }
+
+        await UserModel.update(updates, { where: { id: id } });
+        const updatedUser = await UserModel.findByPk(id);
+        return res.json(updatedUser);
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 };
+
 
 export const remove = async (req, res) => {
     const { id } = req.params;
